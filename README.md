@@ -57,7 +57,7 @@ I've created a series of lessons in the `Learn/` folder to document what I've le
 
 Future additions to this engine:
 - [x] Rendering a simple window with title and color
-- [ ] Rendering 2D shapes and meshes
+- [x] Rendering 2D shapes and meshes
 - [ ] Basic physics simulation (gravity, collision detection)
 - [ ] Input handling and camera controls
 - [ ] Shader programming
