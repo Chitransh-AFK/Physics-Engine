@@ -15,7 +15,7 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor; \n"
 "void main()\n"
 "{\n"
-"FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
+"FragColor = vec4(0.5f, 0.1f, 0.02f, 1.0f);\n"
 "}\n\0";
 
 
@@ -31,9 +31,10 @@ int main(){
     glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
 
     GLfloat vertices[]={
-    -0.5f,-0.5f*float(sqrt(3))/3, 0.0f,
-     0.5f,-0.5f*float(sqrt(3))/3,0.0f,
-     0.0f, 0.5f*float(sqrt(3))*2/3,0.0f
+    -0.5f,-0.5f, 0.0f,
+     0.5f,-0.5f,0.0f,
+     0.0f, 0.0f,0.0,
+     0.0f, 0.5f,0.0f
     };//the vertices of the triangle
 
 
@@ -64,8 +65,6 @@ int main(){
     GLuint shaderProgram= glCreateProgram();//create a shader program object
     glAttachShader(shaderProgram,vertexShader);//attach the vertex shader to the shader program
     glAttachShader(shaderProgram,fragmentShader);//attach the fragment shader to the shader program
-
-
     glLinkProgram(shaderProgram);//link the shader program
 
     glDeleteShader(vertexShader);//delete the vertex shader object
@@ -81,7 +80,7 @@ int main(){
     
     
     
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);//set the vertex attribute pointer
+    glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);//set the vertex attribute pointer
     glEnableVertexAttribArray(0);//enable the vertex attribute array
     
     glBindBuffer(GL_ARRAY_BUFFER,0);//unbind the vertex buffer object
@@ -103,7 +102,7 @@ int main(){
         glUseProgram(shaderProgram);//use the shader program
         glBindVertexArray(VAO);//bind the vertex array object
         
-        glDrawArrays(GL_TRIANGLES,0,3);//draw the triangle
+        glDrawArrays(GL_TRIANGLE_STRIP,0,4);//draw the triangle
         glfwSwapBuffers(window);//swap the color buffer to display the triangle
 
 

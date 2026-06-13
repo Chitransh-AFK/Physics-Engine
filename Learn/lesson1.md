@@ -304,7 +304,6 @@ glClear(GL_COLOR_BUFFER_BIT);            // Clear the screen
 // In initialization:
 glViewport(0, 0, 800, 800);
 glClearColor(0.1f, 0.1f, 0.3f, 1.0f);
-
 // In game loop:
 while(!glfwWindowShouldClose(window)){
     glClear(GL_COLOR_BUFFER_BIT);  // Clear screen with set color
@@ -405,3 +404,4 @@ With buffer swapping:
 | **Swap Buffers** | `glfwSwapBuffers()` | Display rendered frame |
 
 This foundation prepares you for advanced topics like shaders, vertex buffers, and 3D transformations!
+_
