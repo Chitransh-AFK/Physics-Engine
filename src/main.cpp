@@ -2,25 +2,10 @@
 #include <glad/glad.h>//include the glad.h
 #include <GLFW/glfw3.h>//include the glfw3.h
 #include <cmath>
-
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-" gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor; \n"
-"void main()\n"
-"{\n"
-"FragColor = vec4(0.5f, 0.1f, 0.02f, 1.0f);\n"
-"}\n\0";
-
-
-
-
+#include "shaderClass.h"
+#include "VAO.h"
+#include "VBO.h"
+#include "EBO.h"
 
 //In this code is for intializing the window using glad and glfw 
 int main(){
@@ -60,59 +45,37 @@ int main(){
 
     glViewport(0,0,800,800);//set the viewport of openGL in the window
     
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);//create a vertex shader object
-    glShaderSource(vertexShader,1,&vertexShaderSource,NULL);//attach the vertex shader source code to the vertex shader object
-    glCompileShader(vertexShader);//compile the vertex shader
+    Shader* shaderProgram = nullptr;
+    try {
+        shaderProgram = new Shader("../Resources/Shaders/default.vert","../Resources/Shaders/default.frag");//create a shader program object and build the shader program
+    } catch (const std::exception& e) {
+        std::cerr << "Shader load error: " << e.what() << std::endl;
+        glfwTerminate();
+        return -1;
+    }
 
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);//create a fragment shader object
-    glShaderSource(fragmentShader,1,&fragmentShaderSource,NULL);//attach the fragment shader source code to the fragment shader object
-    glCompileShader(fragmentShader);//compile the fragment shader
+    VAO VAO1;//create a vertex array object
+    VAO1.Bind();//bind the vertex array object
 
-    GLuint shaderProgram= glCreateProgram();//create a shader program object
-    glAttachShader(shaderProgram,vertexShader);//attach the vertex shader to the shader program
-    glAttachShader(shaderProgram,fragmentShader);//attach the fragment shader to the shader program
-    glLinkProgram(shaderProgram);//link the shader program
-
-    glDeleteShader(vertexShader);//delete the vertex shader object
-    glDeleteShader(fragmentShader);//delete the fragment shader object
-
-
-    GLuint VAO,VBO,EBO;//create a vertex buffer object and a vertex array object
-    glGenVertexArrays(1,&VAO);//generate a vertex array object
-    glGenBuffers(1,&VBO);//generate a vertex buffer object
-    glGenBuffers(1,&EBO);//generate a element buffer object
-
-    glBindVertexArray(VAO);//bind the vertex array object
+    VBO VBO1(vertices,sizeof(vertices));//create a vertex buffer object and link it to the vertices array
+    EBO EBO1(indices,sizeof(indices));//create an element buffer object and link it to the indices array
     
-    glBindBuffer(GL_ARRAY_BUFFER,VBO);//bind the vertex buffer object to the GL_ARRAY_BUFFER target
-    glBufferData(GL_ARRAY_BUFFER,sizeof(vertices),vertices,GL_STATIC_DRAW);//copy the vertex data to the vertex buffer object
-    
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);//bind the element buffer object to the GL_ELEMENT_ARRAY_BUFFER target
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);//copy the index data to the element buffer object 
-
-    
-    glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);//set the vertex attribute pointer
-    glEnableVertexAttribArray(0);//enable the vertex attribute array
-    
-    glBindBuffer(GL_ARRAY_BUFFER,0);//unbind the vertex buffer object
-    glBindVertexArray(0);//unbind the vertex array object
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);//unbind the element buffer object
-
-    
-    glClearColor(0.5f,0.3f,0.3f,1.0f);//set the clear color the last parameter is the transparency
-    glClear(GL_COLOR_BUFFER_BIT);//clear the color buffer
-    glfwSwapBuffers(window);//swap the color buffer to display the clear color
+    VAO1.LinkVBO(VBO1,0);//link the vertex buffer object to the vertex array object
+    VAO1.Unbind();//unbind the vertex array object
+    VBO1.Unbind();//unbind the vertex buffer object
+    EBO1.Unbind();//unbind the element buffer object
 
 
-    
+   
 
     while(!glfwWindowShouldClose(window)){
 
         glClearColor(0.5f,0.3f,0.3f,1.0f);//set the clear color the last parameter is the transparency
         glClear(GL_COLOR_BUFFER_BIT);//clear the color buffer
         
-        glUseProgram(shaderProgram);//use the shader program
-        glBindVertexArray(VAO);//bind the vertex array object
+        shaderProgram->Activate();//activate the shader program
+        VAO1.Bind();//bind the vertex array object
+
         
         glDrawElements(GL_TRIANGLES,9, GL_UNSIGNED_INT,0);//draw the triangle
         glfwSwapBuffers(window);//swap the color buffer to display the triangle
@@ -124,11 +87,12 @@ int main(){
 
 
 
-    glDeleteVertexArrays(1,&VAO);//delete the vertex array object
-    glDeleteBuffers(1,&VBO);//delete the vertex buffer object
-    glDeleteProgram(shaderProgram);//delete the shader program object
-    glDeleteBuffers(1,&EBO);//delete the element buffer object
-
+    //delete the element buffer object
+    VAO1.Delete();
+    VBO1.Delete();
+    EBO1.Delete();
+    shaderProgram->Delete();
+    delete shaderProgram;
 
     glfwDestroyWindow(window);//destroy the window
     glfwTerminate();//terminate the glfw
