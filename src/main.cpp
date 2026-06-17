@@ -55,10 +55,18 @@ int main() {
         return -1;
     }
 
+    // Vertex positions for a square composed of two triangles.
     float vertices[] = {
-         0.5f,  0.0f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
+    };
+
+    // Element indices define the two triangles that make up the square.
+    unsigned int indices[] = {
+        0, 1, 3,
+        1, 2, 3
     };
 
     unsigned int vertexShader,fragmentShader,shaderProgram;
@@ -95,9 +103,12 @@ int main() {
     
 
 
-    unsigned int VBO, VAO;
+    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    // Bind the VAO first, then configure vertex buffer and attribute pointers.
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -106,27 +117,41 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glUseProgram(shaderProgram);
-    
-    // The shader objects are no longer needed after program linking.
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    // Upload the element index data for drawing via glDrawElements.
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+
+    
+    
+    
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // Main render loop: draw the triangle until the window is closed.
+    // Main render loop: draw the square composed of two triangles until the window is closed.
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
-
+        glUseProgram(shaderProgram);
+        
         glClearColor(0.2f, 0.4f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // Bind the VAO and draw using indexed geometry.
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     // Clean up GPU resources.
+    
+    // The shader objects are no longer needed after program linking.
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
     glfwDestroyWindow(window);
