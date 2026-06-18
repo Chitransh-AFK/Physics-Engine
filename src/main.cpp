@@ -18,11 +18,11 @@ const char* fragmentShaderSource = "#version 330 core\n"
         "FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
     "}\0";
 
-
+//resize the drawing w.r.t to window resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
-
+//exits the code when pressed esc key
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
@@ -30,15 +30,18 @@ void processInput(GLFWwindow* window) {
 }
 
 int main() {
+    //checking if glfw is initialized correctly
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
 
+    //giving glfw the version of glfw and gl we want to import 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    //creating a window object
     GLFWwindow* window = glfwCreateWindow(800, 600, "PhysicsEngine", NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -46,8 +49,9 @@ int main() {
         return -1;
     }
 
+    //seting the context of the window to current
     glfwMakeContextCurrent(window);
-
+    //checking the initialization of glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         glfwDestroyWindow(window);
@@ -69,7 +73,10 @@ int main() {
         1, 2, 3
     };
 
+    //creating shader,compiling it and linking it to shaderProgram
+
     unsigned int vertexShader,fragmentShader,shaderProgram;
+
     vertexShader=glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader,1,&vertexShaderSource,NULL);
     glCompileShader(vertexShader);
@@ -81,8 +88,10 @@ int main() {
     shaderProgram=glCreateProgram();
     glAttachShader(shaderProgram,vertexShader);
     glAttachShader(shaderProgram,fragmentShader);
+    //linking shader Program to the GPU
     glLinkProgram(shaderProgram);
     
+    //checking for the error logs in the shaders program
     int successV,successF,successP;
     char infoV[512],infoF[512],infoP[512];
     glGetShaderiv(vertexShader,GL_COMPILE_STATUS,&successV);
@@ -102,7 +111,7 @@ int main() {
 
     
 
-
+    //creating Vertex buffer object,Vertex array object and Element buffer object 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -133,9 +142,10 @@ int main() {
         processInput(window);
         glUseProgram(shaderProgram);
         
-        glClearColor(0.2f, 0.4f, 0.2f, 1.0f);
+        glClearColor(0.0f, 0.4f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
+        
+        glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
         // Bind the VAO and draw using indexed geometry.
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -150,10 +160,11 @@ int main() {
     // The shader objects are no longer needed after program linking.
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-
-
+    //Delete Buffers
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1,&EBO);
+    //destroy the window and terminate the glfw
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
