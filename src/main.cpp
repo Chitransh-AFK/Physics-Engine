@@ -70,7 +70,7 @@ int main() {
     };
 
     // Initialize shader program from external shader files
-    Shader shader("Resources/Shaders/default.vert", "Resources/Shaders/default.frag");
+    Shader shader("../Resources/Shaders/default.vert", "../Resources/Shaders/default.frag");
     
     // Create and configure vertex array object
     VAO vao;
