@@ -5,7 +5,7 @@
 #include "VBO.h"
 #include "VAO.h"
 #include "EBO.h"
-
+#include <math.h>
 // Callback function to handle window resize events
 // Updates the OpenGL viewport to match the new window dimensions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -31,6 +31,8 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    
 
     // Create the application window
     GLFWwindow* window = glfwCreateWindow(800, 600, "PhysicsEngine", NULL, NULL);
@@ -66,7 +68,7 @@ int main() {
     // Define element indices for indexed drawing
     unsigned int indices[] = {
         0, 1, 3,  // First triangle
-        1, 2, 3   // Second triangle
+        1, 2, 0   // Second triangle
     };
 
     // Initialize shader program from external shader files
@@ -87,7 +89,8 @@ int main() {
     vao.LinkVBO(vbo, 0);  // Bind VBO to layout location 0
     vao.Unbind();
     ebo.Unbind();
-
+    
+  
     // Main render loop - runs until window is closed
     while (!glfwWindowShouldClose(window)) {
         // Process user input
@@ -99,6 +102,14 @@ int main() {
 
         // Activate shader program and render the geometry
         shader.Activate();
+
+        float timeValue =glfwGetTime();
+        float greenValue=sin(timeValue)/ 2.0f + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shader.ID, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+
+
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
