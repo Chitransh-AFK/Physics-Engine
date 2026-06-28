@@ -8,6 +8,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${workspaceFolder}/src/main.cpp",
+                "${workspaceFolder}/src/Movement.cpp",
                 "${workspaceFolder}/src/glad.c",
                 "${workspaceFolder}/src/shaderClass.cpp",
                 "${workspaceFolder}/src/VBO.cpp",
