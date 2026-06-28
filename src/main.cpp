@@ -91,39 +91,49 @@ int main() {
 
     // Define vertex positions for a square (two triangles)
     float vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+    // positions
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    };
+ 
+    unsigned int indices[] = {
+        0,1,2, 2,3,0,   // back face
+        4,5,6, 6,7,4,   // front face
+        0,4,7, 7,3,0,   // left face
+        1,5,6, 6,2,1,   // right face
+        3,2,6, 6,7,3,   // top face
+        0,1,5, 5,4,0    // bottom face
     };
 
-    // Define element indices for indexed drawing
-    unsigned int indices[] = {
-        0, 1, 3,  // First triangle
-        1, 2, 0   // Second triangle
-    };
 
     // Initialize shader program from external shader files
     Shader shader("../Resources/Shaders/default.vert", "../Resources/Shaders/default.frag");
     
-    // Create and configure vertex array object
+    // Create and configure vertex array object.
     VAO vao;
     
-    // Create and upload vertex buffer object with vertex data
+    // Create and upload vertex buffer object with vertex data.
     VBO vbo(vertices, sizeof(vertices));
     
-    // Create and upload element buffer object with indices
+    // Create and upload element buffer object with index data.
     EBO ebo(indices, sizeof(indices));
 
-    // Link vertex attributes to the VAO
+    // Link the VBO and EBO into the VAO so the vertex attributes are bound once.
     vao.Bind();
     ebo.Bind();
-    vao.LinkVBO(vbo, 0);  // Bind VBO to layout location 0
+    vao.LinkVBO(vbo, 0);  // Bind VBO to layout location 0.
     vao.Unbind();
     ebo.Unbind();
     
-  
-    // Main render loop - runs until window is closed
+    glEnable(GL_DEPTH_TEST);
+
+    // Main render loop - runs until the user closes the window.
     while (!glfwWindowShouldClose(window)) {
         // Update the movement controller first so the view matrix reflects the latest camera pose.
         movement.Update();
