@@ -87,6 +87,8 @@ int main() {
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    MovementController movement(window);
+
     // Define vertex positions for a square (two triangles)
     float vertices[] = {
         0.5f,  0.5f, 0.0f,  // top right
@@ -123,27 +125,37 @@ int main() {
   
     // Main render loop - runs until window is closed
     while (!glfwWindowShouldClose(window)) {
-        // Process user input
-        processInput(window);
+        // Update the movement controller first so the view matrix reflects the latest camera pose.
+        movement.Update();
 
-        // Clear the framebuffer with a solid color
-        glClearColor(0.0f, 0.4f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        // Clear the framebuffer with a grey background and depth buffer.
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Activate shader program and render the geometry
+        // Activate shader program and render the geometry.
         shader.Activate();
 
-        float timeValue =glfwGetTime();
-        float greenValue=sin(timeValue)/ 2.0f + 0.5f;
+        // Animate the cube's color over time.
+        float timeValue = static_cast<float>(glfwGetTime());
+        float greenValue = std::sin(timeValue) / 2.0f + 0.5f;
         int vertexColorLocation = glGetUniformLocation(shader.ID, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
+        // Compute the MVP matrix using the projection and camera view matrices.
+        int mvpLocation = glGetUniformLocation(shader.ID, "MVP");
+        float aspect = 800.0f / 600.0f;
+        float projection[16];
+        perspective(radians(45.0f), aspect, 0.1f, 100.0f, projection);
 
+        float mvp[16];
+        multiplyMat4(projection, movement.GetViewMatrix(), mvp);
+        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, mvp);
 
+        // Draw the cube using the VAO bound to the shader.
         vao.Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-        // Swap framebuffers and poll for events
+        // Swap buffers and poll for input events.
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
