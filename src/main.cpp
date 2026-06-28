@@ -5,19 +5,49 @@
 #include "VBO.h"
 #include "VAO.h"
 #include "EBO.h"
-#include <math.h>
+#include "Movement.h"
+#include <cmath>
+
+static float radians(float degrees) {
+    return degrees * 3.14159265358979323846f / 180.0f;
+}
+
+void perspective(float fovRadians, float aspect, float nearPlane, float farPlane, float projection[16]) {
+    float f = 1.0f / std::tan(fovRadians / 2.0f);
+    projection[0] = f / aspect;
+    projection[1] = 0.0f;
+    projection[2] = 0.0f;
+    projection[3] = 0.0f;
+    projection[4] = 0.0f;
+    projection[5] = f;
+    projection[6] = 0.0f;
+    projection[7] = 0.0f;
+    projection[8] = 0.0f;
+    projection[9] = 0.0f;
+    projection[10] = (farPlane + nearPlane) / (nearPlane - farPlane);
+    projection[11] = -1.0f;
+    projection[12] = 0.0f;
+    projection[13] = 0.0f;
+    projection[14] = (2.0f * farPlane * nearPlane) / (nearPlane - farPlane);
+    projection[15] = 0.0f;
+}
+
+void multiplyMat4(const float a[16], const float b[16], float out[16]) {
+    for (int col = 0; col < 4; ++col) {
+        for (int row = 0; row < 4; ++row) {
+            float sum = 0.0f;
+            for (int k = 0; k < 4; ++k) {
+                sum += a[k * 4 + row] * b[col * 4 + k];
+            }
+            out[col * 4 + row] = sum;
+        }
+    }
+}
+
 // Callback function to handle window resize events
 // Updates the OpenGL viewport to match the new window dimensions
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
-}
-
-// Handle user input for closing the application
-// Exits the render loop when ESC key is pressed
-void processInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
 }
 
 int main() {
@@ -44,7 +74,7 @@ int main() {
 
     // Set the OpenGL context for this thread
     glfwMakeContextCurrent(window);
-    
+
     // Load OpenGL function pointers using GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
