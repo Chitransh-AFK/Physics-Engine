@@ -241,6 +241,18 @@ const float* MovementController::GetViewMatrix() const {
     return m_viewMatrix;
 }
 
+const float* MovementController::GetCameraPosition() const {
+    return m_cameraPos;
+}
+
+const float* MovementController::GetCameraFront() const {
+    return m_cameraFront;
+}
+
+const float* MovementController::GetCameraUp() const {
+    return m_cameraUp;
+}
+
 bool MovementController::IsCursorDetached() const {
     return m_cursorDetached;
 }

@@ -15,6 +15,15 @@ public:
     // Return the latest view matrix computed from the camera position and direction.
     const float* GetViewMatrix() const;
 
+    // Return the camera position in world space.
+    const float* GetCameraPosition() const;
+
+    // Return the camera forward direction.
+    const float* GetCameraFront() const;
+
+    // Return the camera up direction.
+    const float* GetCameraUp() const;
+
     // Returns true when the cursor is detached for external usage.
     bool IsCursorDetached() const;
 
