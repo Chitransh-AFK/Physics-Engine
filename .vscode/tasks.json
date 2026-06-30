@@ -7,13 +7,23 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
+                "-std=c++17",
                 "${workspaceFolder}/src/main.cpp",
                 "${workspaceFolder}/src/Movement.cpp",
+                "${workspaceFolder}/src/GravityController.cpp",
+                "${workspaceFolder}/src/RotationController.cpp",
+                "${workspaceFolder}/src/Shapes.cpp",
                 "${workspaceFolder}/src/glad.c",
                 "${workspaceFolder}/src/shaderClass.cpp",
                 "${workspaceFolder}/src/VBO.cpp",
                 "${workspaceFolder}/src/VAO.cpp",
                 "${workspaceFolder}/src/EBO.cpp",
+                "${workspaceFolder}/src/imgui.cpp",
+                "${workspaceFolder}/src/imgui_draw.cpp",
+                "${workspaceFolder}/src/imgui_tables.cpp",
+                "${workspaceFolder}/src/imgui_widgets.cpp",
+                "${workspaceFolder}/src/imgui_impl_glfw.cpp",
+                "${workspaceFolder}/src/imgui_impl_opengl3.cpp",
                 "-I${workspaceFolder}/include",
                 "-L${workspaceFolder}/lib",
                 "-lglfw3",
@@ -32,7 +42,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Custom compiler task for OpenGL project."
+            "detail": "Build physics engine with Dear ImGui."
         }
     ],
     "version": "2.0.0"
